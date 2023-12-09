@@ -143,6 +143,8 @@ export function finalizeVisualization() {
     scene?.clear()
     renderer?.render(scene, camera)
 
+    renderer?.domElement.remove()
+
     renderer = null
     camera = null
     scene = null

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulation Visualizer</title>
+    <script type="module" src="src/index.ts"></script>
+</head>
+<body>
+    <div id="connection" style="position: absolute; left: 0; right: 0;text-align: center;color: white;display: flex;align-items: center;justify-content: center">
+        <h1>Waiting for connection</h1>
+        <div class="dot-flashing" style="margin:16px 0 0 20px;"></div>
+    </div>
+    <details style="position: absolute; right: 0; bottom: 0;min-width: 30vw;">
+        <summary>Panel</summary>
+        <div>
+            <pre id="status" style="font-family: monospace"></pre>
+            <pre id="tracked" style="font-family: monospace; max-height: 200px; overflow: auto"></pre>
+        </div>
+    </details>
+</body>
+</html>

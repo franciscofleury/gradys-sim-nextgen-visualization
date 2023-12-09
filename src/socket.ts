@@ -21,7 +21,7 @@ function socketConnectionFailed(
     }
     socket = null;
 
-    window.setTimeout(() => connectToSocket(initCallback, onDataCallback, onFinalizeCallback), 10)
+    window.setTimeout(() => connectToSocket(initCallback, onDataCallback, onFinalizeCallback), 0)
 }
 
 export function connectToSocket(

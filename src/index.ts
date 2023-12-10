@@ -17,4 +17,4 @@ function finalize() {
     finalizeVisualization()
 }
 
-await connectToSocket(initialize, updateData, finalize);
+connectToSocket(initialize, updateData, finalize).catch((_e) => console.error("Error connecting to socket"))

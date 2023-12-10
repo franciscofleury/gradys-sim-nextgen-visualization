@@ -24,14 +24,40 @@ function socketConnectionFailed(
     window.setTimeout(() => connectToSocket(initCallback, onDataCallback, onFinalizeCallback), 0)
 }
 
-export function connectToSocket(
+/**
+ * Quickly ping the socket until it's up
+ */
+async function waitUntilUp() {
+    let pingCount = 0
+
+    while (true) {
+        console.log(`Pinging socket ${pingCount}`)
+
+        const timeoutController = new AbortController();
+        const timeout = setTimeout(() => timeoutController.abort(), 200);
+        try {
+            await fetch("http://localhost:5678", {signal: timeoutController.signal, mode: 'no-cors'});
+            clearTimeout(timeout);
+            return;
+        } catch (e) {
+            clearTimeout(timeout);
+            pingCount++
+            await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+    }
+}
+
+export async function connectToSocket(
     initCallback: (data: InitializationData) => void,
     onDataCallback: (data: SimulationData) => void,
     onFinalizeCallback: () => void
 ) {
     let firstMessage = false;
+
+    await waitUntilUp();
+
     socket = new WebSocket("ws://localhost:5678");
-    socket.onopen = function (e) {
+    socket.onopen = function (_e) {
         console.log("[open] Connection established");
         toggleUI(false)
     };

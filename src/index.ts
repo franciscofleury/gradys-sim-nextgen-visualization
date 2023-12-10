@@ -17,4 +17,4 @@ function finalize() {
     finalizeVisualization()
 }
 
-connectToSocket(initialize, updateData, finalize);
+await connectToSocket(initialize, updateData, finalize);

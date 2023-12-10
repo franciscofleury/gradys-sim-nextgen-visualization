@@ -11,12 +11,11 @@ let camera: THREE.PerspectiveCamera = null;
 const statusElement = document.getElementById("status") as HTMLPreElement;
 const trackedElement = document.getElementById("tracked") as HTMLPreElement;
 
-/**
- * Creates the 3D scatter plot
- */
+
 export function initializeVisualization(data: InitializationData) {
     // Set up the scene
     scene = new THREE.Scene();
+    scene.background = new THREE.Color("#39d7ff")
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({
         antialias: true
@@ -56,7 +55,7 @@ export function initializeVisualization(data: InitializationData) {
 
     // Create vehicles on the ground
     const vehicleGeometry = new THREE.SphereGeometry(0.3, 32, 32);
-    const vehicleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const vehicleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     for (const _node of data.nodes) {
         const vehicle = new THREE.Mesh(vehicleGeometry, vehicleMaterial);
@@ -104,9 +103,6 @@ function formatTime(time: number) {
 }
 
 
-/**
- * Animates the plot with new data
- */
 export function update(data: SimulationData) {
     if (scene == null) {
         return

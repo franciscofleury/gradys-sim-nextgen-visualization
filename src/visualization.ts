@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { MapControls } from 'three/addons/controls/MapControls.js';
 import {InitializationData, SimulationData} from "./data";
 
+let nodes: string[] = [];
 let vehicles: THREE.Mesh[] = [];
 let scene: THREE.Scene = null;
 let renderer: THREE.Renderer = null;
@@ -30,6 +31,8 @@ colorForm.addEventListener("submit", (e) => {
 
 
 export function initializeVisualization(data: InitializationData) {
+    nodes = data.nodes;
+
     // Set up the scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color("#39d7ff")
@@ -144,7 +147,7 @@ export function update(data: SimulationData) {
 
     let index = 0;
     for (const tracked of data.tracked_variables) {
-        trackedVariableStrings += `Node ${index}\n${JSON.stringify(tracked, undefined, 2)}\n\n`
+        trackedVariableStrings += `${nodes[index]}\n${JSON.stringify(tracked, undefined, 2)}\n\n`
         trackedVariableStrings += "------------------------\n"
         index++
     }
@@ -177,6 +180,8 @@ export function finalizeVisualization() {
     }
 
     nodeSelectElement.innerHTML = ""
+
+    nodes = [];
 
     renderer = null
     camera = null

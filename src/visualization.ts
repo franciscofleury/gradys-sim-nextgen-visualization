@@ -8,6 +8,8 @@ let scene: THREE.Scene = null;
 let renderer: THREE.Renderer = null;
 let camera: THREE.PerspectiveCamera = null;
 
+let resizeEvent: () => void = null;
+
 const statusElement = document.getElementById("status") as HTMLPreElement;
 const trackedElement = document.getElementById("tracked") as HTMLPreElement;
 
@@ -77,8 +79,7 @@ export function initializeVisualization(data: InitializationData) {
         renderer.render(scene, camera);
     };
 
-    // Handle window resize
-    window.addEventListener('resize', () => {
+    resizeEvent = () => {
         const newWidth = window.innerWidth;
         const newHeight = window.innerHeight;
 
@@ -86,7 +87,10 @@ export function initializeVisualization(data: InitializationData) {
         camera.updateProjectionMatrix();
 
         renderer.setSize(newWidth, newHeight);
-    });
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', resizeEvent);
 
     // Start the animation loop
     animate();
@@ -136,10 +140,21 @@ Real time: ${formatTime(data.real_time)}`
 
 export function finalizeVisualization() {
     vehicles = []
-    scene?.clear()
-    renderer?.render(scene, camera)
+    while (scene?.children.length > 0) {
+        // Dispose of the geometry and materials
+        const mesh = scene.children[0] as THREE.Mesh;
+        mesh?.geometry.dispose();
+        const material = mesh?.material as THREE.Material;
+        material.dispose();
 
+        scene.remove(scene.children[0]);
+    }
+    renderer?.render(scene, camera)
     renderer?.domElement.remove()
+
+    if (resizeEvent != null) {
+        window.removeEventListener('resize', resizeEvent);
+    }
 
     renderer = null
     camera = null

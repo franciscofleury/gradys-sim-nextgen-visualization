@@ -36,7 +36,7 @@ export function initializeVisualization(data: InitializationData) {
         sceneHeight,
         20,
         20);
-    const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide, wireframe: true });
+    const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide, wireframe: true });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = Math.PI / 2; // Make the ground horizontal
     scene.add(ground);

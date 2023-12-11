@@ -17,5 +17,25 @@
             <pre id="tracked" style="font-family: monospace; max-height: 200px; overflow: auto"></pre>
         </div>
     </details>
+
+    <details id="color" style="position: absolute; left: 0; bottom: 0;">
+        <summary>Color</summary>
+        <div>
+            <form style="display: flex;flex-direction: column" id="color-form">
+                <div style="display: flex;flex-direction: column;margin-bottom: 8px">
+                    <div style="display: flex;margin-bottom: 8px;">
+                        <label for="nodes">Nodes Affected</label>
+                        <select id="nodes" name="nodes" multiple style="flex: 1 1 auto;">
+                        </select>
+                    </div>
+                    <div style="display: flex">
+                        <label for="node-color">Node Color</label>
+                        <input type="color" id="node-color" name="node-color" value="#ff0000" style="flex: 1 1 auto;">
+                    </div>
+                </div>
+                <button type="submit" value="Submit" style="margin-left: auto">Color</button>
+            </form>
+        </div>
+    </details>
 </body>
 </html>

@@ -1,5 +1,5 @@
 export interface InitializationData {
-    nodes: number[]
+    nodes: string[]
     x_range: [number, number]
     y_range: [number, number]
     z_range: [number, number],

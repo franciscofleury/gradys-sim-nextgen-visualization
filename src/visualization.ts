@@ -12,6 +12,21 @@ let resizeEvent: () => void = null;
 
 const statusElement = document.getElementById("status") as HTMLPreElement;
 const trackedElement = document.getElementById("tracked") as HTMLPreElement;
+const colorForm = document.getElementById("color-form") as HTMLFormElement;
+const nodeSelectElement= document.getElementById("nodes") as HTMLSelectElement;
+
+
+colorForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+
+    const formData = new FormData(colorForm)
+    const color = formData.get("node-color") as string
+    const nodes = formData.getAll("nodes").map(n => parseInt(n as string))
+
+    for (const node of nodes) {
+        vehicles[node].material = new THREE.MeshBasicMaterial({ color: color });
+    }
+})
 
 
 export function initializeVisualization(data: InitializationData) {
@@ -59,13 +74,18 @@ export function initializeVisualization(data: InitializationData) {
     const vehicleGeometry = new THREE.SphereGeometry(0.3, 32, 32);
     const vehicleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-    for (const _node of data.nodes) {
+    for (const node of data.nodes) {
         const vehicle = new THREE.Mesh(vehicleGeometry, vehicleMaterial);
         vehicle.position.x = 0; // Random x position on the ground
         vehicle.position.y = 0; // Height above the ground
         vehicle.position.z = 0; // Random z position on the ground
         scene.add(vehicle);
         vehicles.push(vehicle);
+
+        const selectOption = document.createElement("option")
+        selectOption.value = (vehicles.length - 1).toString()
+        selectOption.innerText = node
+        nodeSelectElement.appendChild(selectOption)
     }
 
     // Animation function
@@ -155,6 +175,8 @@ export function finalizeVisualization() {
     if (resizeEvent != null) {
         window.removeEventListener('resize', resizeEvent);
     }
+
+    nodeSelectElement.innerHTML = ""
 
     renderer = null
     camera = null

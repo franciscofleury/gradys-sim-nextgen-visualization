@@ -4,9 +4,11 @@ let socket = null;
 
 const panelElement = document.getElementById("panel");
 const connectionElement = document.getElementById("connection");
+const colorElement = document.getElementById("color") as HTMLDivElement;
 function toggleUI(hide: boolean) {
     connectionElement.style.visibility = hide ? "visible" : "hidden";
     panelElement.style.visibility = !hide ? "visible" : "hidden";
+    colorElement.style.visibility = !hide ? "visible" : "hidden";
 }
 
 toggleUI(true);

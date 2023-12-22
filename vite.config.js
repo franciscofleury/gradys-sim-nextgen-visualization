@@ -1,3 +1,3 @@
 export default {
-    base: '/grady-sim-nextgen-visualization/'
+    base: '/gradys-sim-nextgen-visualization/'
 }

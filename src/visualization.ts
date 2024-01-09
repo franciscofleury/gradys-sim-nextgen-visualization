@@ -77,7 +77,7 @@ export function initializeVisualization(data: InitializationData) {
 
 
     // Create vehicles on the ground
-    const vehicleGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+    const vehicleGeometry = new THREE.SphereGeometry(sceneSize / 1000, 32, 32);
     const vehicleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     for (const node of data.nodes) {

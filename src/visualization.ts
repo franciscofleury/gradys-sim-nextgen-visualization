@@ -36,7 +36,10 @@ export function initializeVisualization(data: InitializationData) {
     // Set up the scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color("#39d7ff")
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const sceneSize = Math.max(data.x_range[1] - data.x_range[0],
+        data.y_range[1] - data.y_range[0],
+        data.z_range[1] - data.z_range[0]) * 2;
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, sceneSize);
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });

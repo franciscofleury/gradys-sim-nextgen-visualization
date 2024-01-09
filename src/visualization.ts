@@ -65,7 +65,7 @@ export function initializeVisualization(data: InitializationData) {
     scene.add(ground);
 
     // Set the camera position
-    camera.position.set(sceneCenterX + sceneWidth/2, 10, sceneCenterY + sceneHeight/2);
+    camera.position.set(sceneCenterX + sceneWidth/2, data.z_range[1], sceneCenterY + sceneHeight/2);
     camera.lookAt(new THREE.Vector3(sceneCenterX, 0, sceneCenterY));
 
     // Create OrbitControls

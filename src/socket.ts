@@ -86,8 +86,8 @@ export async function connectToSocket(
         socketConnectionFailed(initCallback, onDataCallback, onFinalizeCallback)
     };
 
-    socket.onerror = function (error) {
-        console.log(`[error] ${error.message}`);
+    socket.onerror = function () {
+        console.log("[error]");
         socket.close()
     };
 }

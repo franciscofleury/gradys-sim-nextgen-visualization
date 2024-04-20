@@ -5,10 +5,13 @@ export let socket: WebSocket | null = null;
 const panelElement = document.getElementById("panel");
 const connectionElement = document.getElementById("connection");
 const colorElement = document.getElementById("color") as HTMLDivElement;
+const interactionElement = document.getElementById("interaction");
+
 function toggleUI(hide: boolean) {
     connectionElement.style.visibility = hide ? "visible" : "hidden";
     panelElement.style.visibility = !hide ? "visible" : "hidden";
     colorElement.style.visibility = !hide ? "visible" : "hidden";
+    interactionElement.style.visibility = !hide ? "visible" : "hidden";
 }
 
 toggleUI(true);

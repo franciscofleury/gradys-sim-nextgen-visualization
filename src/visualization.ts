@@ -190,3 +190,7 @@ export function finalizeVisualization() {
     camera = null
     scene = null
 }
+
+export function configureInteractions() {
+
+}

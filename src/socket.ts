@@ -1,6 +1,6 @@
 import {InitializationData, SimulationData} from "./data";
 
-let socket = null;
+export let socket: WebSocket | null = null;
 
 const panelElement = document.getElementById("panel");
 const connectionElement = document.getElementById("connection");
@@ -84,7 +84,6 @@ export async function connectToSocket(
         firstMessage = false;
         toggleUI(true);
         socketConnectionFailed(initCallback, onDataCallback, onFinalizeCallback)
-
     };
 
     socket.onerror = function (error) {

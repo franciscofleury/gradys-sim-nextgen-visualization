@@ -3,10 +3,12 @@ import {update, initializeVisualization, finalizeVisualization} from "./visualiz
 
 import "../style.css"
 import {InitializationData, SimulationData} from "./data";
+import {initializeInteraction} from "./interaction";
 
 
 function initialize(data: InitializationData) {
     initializeVisualization(data)
+    initializeInteraction()
 }
 
 function updateData(data: SimulationData) {

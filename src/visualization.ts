@@ -4,7 +4,7 @@ import { MapControls } from 'three/addons/controls/MapControls.js';
 import {InitializationData, SimulationData} from "./data";
 
 let nodes: string[] = [];
-let vehicles: THREE.Mesh[] = [];
+let vehicles: Record<string, THREE.Mesh> = {};
 let scene: THREE.Scene = null;
 let renderer: THREE.Renderer = null;
 let camera: THREE.PerspectiveCamera = null;
@@ -22,12 +22,23 @@ colorForm.addEventListener("submit", (e) => {
 
     const formData = new FormData(colorForm)
     const color = formData.get("node-color") as string
-    const nodes = formData.getAll("nodes").map(n => parseInt(n as string))
+    const nodes = formData.getAll("nodes").map(n => n as string)
 
     for (const node of nodes) {
         vehicles[node].material = new THREE.MeshBasicMaterial({ color: color });
+
+        localStorage.setItem(`${node}-color`, color)
     }
 })
+
+function loadStoredColors() {
+    for(const node of nodes) {
+        const color = localStorage.getItem(`${node}-color`)
+        if (color != null) {
+            vehicles[node].material = new THREE.MeshBasicMaterial({ color: color });
+        }
+    }
+}
 
 
 export function initializeVisualization(data: InitializationData) {
@@ -86,13 +97,15 @@ export function initializeVisualization(data: InitializationData) {
         vehicle.position.y = 0; // Height above the ground
         vehicle.position.z = 0; // Random z position on the ground
         scene.add(vehicle);
-        vehicles.push(vehicle);
+        vehicles[node] = vehicle;
 
         const selectOption = document.createElement("option")
-        selectOption.value = (vehicles.length - 1).toString()
+        selectOption.value = node
         selectOption.innerText = node
         nodeSelectElement.appendChild(selectOption)
     }
+
+    loadStoredColors()
 
     // Animation function
     const animate = () => {
@@ -139,12 +152,12 @@ export function update(data: SimulationData) {
     }
 
     // Update the vehicle positions
-    for (let i = 0; i < vehicles.length; i++) {
+    nodes.forEach((node, i) => {
         const pos = data.positions[i];
-        vehicles[i].position.x = pos[0];
-        vehicles[i].position.y = pos[2];
-        vehicles[i].position.z = pos[1];
-    }
+        vehicles[node].position.x = pos[0];
+        vehicles[node].position.y = pos[2];
+        vehicles[node].position.z = pos[1];
+    })
 
     let trackedVariableStrings = "------------------------\n"
 
@@ -165,7 +178,7 @@ Real time: ${formatTime(data.real_time)}`
 }
 
 export function finalizeVisualization() {
-    vehicles = []
+    vehicles = {};
     while (scene?.children.length > 0) {
         // Dispose of the geometry and materials
         const mesh = scene.children[0] as THREE.Mesh;
@@ -189,4 +202,8 @@ export function finalizeVisualization() {
     renderer = null
     camera = null
     scene = null
+}
+
+export function configureInteractions() {
+
 }

@@ -45,7 +45,7 @@ form, details {
 }
 
 details {
-
+  margin: 0;
 }
 
 details > summary {

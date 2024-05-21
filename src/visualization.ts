@@ -14,6 +14,7 @@ let resizeEvent: () => void = null;
 const statusElement = document.getElementById("status") as HTMLPreElement;
 const trackedElement = document.getElementById("tracked") as HTMLPreElement;
 const colorForm = document.getElementById("color-form") as HTMLFormElement;
+const environmentForm = document.getElementById("environment-form") as HTMLFormElement;
 const nodeSelectElement= document.getElementById("nodes") as HTMLSelectElement;
 
 
@@ -31,11 +32,40 @@ colorForm.addEventListener("submit", (e) => {
     }
 })
 
-function loadStoredColors() {
+environmentForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(environmentForm);
+    const bgColor = formData.get("background-color") as string
+    const nodeSize = parseFloat(formData.get("node-size") as string)
+
+    scene.background = new THREE.Color(bgColor)
+    
+    for (const vehicle of Object.values(vehicles)) {
+        vehicle.geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+    }
+
+    localStorage.setItem("environment-background-color", bgColor)
+    localStorage.setItem("environment-node-size", nodeSize.toString())
+})
+
+function loadStoredConfigs() {
+    const bgColor = localStorage.getItem("environment-background-color")
+    const nodeSizeStored = localStorage.getItem("environment-node-size")
+    const nodeSize = nodeSizeStored !== null ? parseFloat(nodeSizeStored) : null
+
+    if (bgColor !== null) {
+        scene.background = new THREE.Color(bgColor)
+    }
+
     for(const node of nodes) {
         const color = localStorage.getItem(`${node}-color`)
         if (color != null) {
             vehicles[node].material = new THREE.MeshBasicMaterial({ color: color });
+
+        }
+        if (nodeSize != null) {
+            vehicles[node].geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
         }
     }
 }
@@ -88,7 +118,7 @@ export function initializeVisualization(data: InitializationData) {
 
 
     // Create vehicles on the ground
-    const vehicleGeometry = new THREE.SphereGeometry(sceneSize / 1000, 32, 32);
+    const vehicleGeometry = new THREE.SphereGeometry(0.1, 32, 32);
     const vehicleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     for (const node of data.nodes) {
@@ -105,7 +135,7 @@ export function initializeVisualization(data: InitializationData) {
         nodeSelectElement.appendChild(selectOption)
     }
 
-    loadStoredColors()
+    loadStoredConfigs()
 
     // Animation function
     const animate = () => {

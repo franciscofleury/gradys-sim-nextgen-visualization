@@ -19,7 +19,7 @@
     </details>
 
     <details id="color" style="position: absolute; left: 0; bottom: 0;">
-        <summary>Color</summary>
+        <summary>Customization</summary>
         <div>
             <form style="display: flex;flex-direction: column" id="color-form">
                 <div style="display: flex;flex-direction: column;margin-bottom: 8px">
@@ -34,6 +34,19 @@
                     </div>
                 </div>
                 <button type="submit" value="Submit" style="margin-left: auto">Color</button>
+            </form>
+            <form style="display: flex; flex-direction: column;" id="environment-form">
+                <div style="display: flex;flex-direction: column;margin-bottom: 8px">
+                    <div style="display: flex">
+                        <label for="background-color">Background Color</label>
+                        <input type="color" id="background-color" name="background-color" value="#39d7ff" style="flex: 1 1 auto;" required>
+                    </div>
+                    <div style="display: flex">
+                        <label for="node-size">Node Size</label>
+                        <input type="number" step="0.01" id="node-size" name="node-size" value="0.1" style="flex: 1 1 auto;" required>
+                    </div>
+                </div>
+                <button type="submit" value="Submit" style="margin-left: auto">Apply</button>
             </form>
         </div>
     </details>

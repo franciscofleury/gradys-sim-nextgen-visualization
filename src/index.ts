@@ -1,8 +1,8 @@
 import {connectToSocket} from "./socket.js"
-import {update, initializeVisualization, finalizeVisualization} from "./visualization.js";
+import {update, initializeVisualization, finalizeVisualization, executeCommand} from "./visualization.js";
 
 import "../style.css"
-import {InitializationData, SimulationData} from "./data";
+import {InitializationData, SimulationData, VisualizationCommand} from "./data";
 import {initializeInteraction} from "./interaction";
 
 
@@ -11,8 +11,12 @@ function initialize(data: InitializationData) {
     initializeInteraction()
 }
 
-function updateData(data: SimulationData) {
-    update(data)
+function updateData(data: SimulationData | VisualizationCommand) {
+    if ("command" in data) {
+        executeCommand(data)
+    } else {
+        update(data)
+    }
 }
 
 function finalize() {

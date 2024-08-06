@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 // @ts-ignore
 import { MapControls } from 'three/addons/controls/MapControls.js';
-import {InitializationData, SimulationData} from "./data";
+import {InitializationData, SimulationData, VisualizationCommand} from "./data";
 
 let nodes: string[] = [];
 let vehicles: Record<string, THREE.Mesh> = {};
@@ -204,7 +204,23 @@ export function update(data: SimulationData) {
 Real time: ${formatTime(data.real_time)}`
 
     trackedElement.innerText = `Tracked variables:\n${trackedVariableStrings}`
+}
 
+export function executeCommand(command: VisualizationCommand) {
+    if (command.command === "paint_node") {
+        const {node_id, color} = command.payload;
+        const node = nodes[node_id];
+        const rgbColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+        vehicles[node].material = new THREE.MeshBasicMaterial({ color: rgbColor });
+    } else if (command.command === "paint_environment") {
+        const {color} = command.payload;
+        scene.background = new THREE.Color(...color)
+    } else if (command.command === "resize_nodes") {
+        const {size} = command.payload;
+        for (const vehicle of Object.values(vehicles)) {
+            vehicle.geometry = new THREE.SphereGeometry(size, 32, 32);
+        }
+    }
 }
 
 export function finalizeVisualization() {

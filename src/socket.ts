@@ -1,4 +1,4 @@
-import {InitializationData, SimulationData} from "./data";
+import {InitializationData, SimulationData, VisualizationCommand} from "./data";
 
 export let socket: WebSocket | null = null;
 
@@ -54,7 +54,7 @@ async function waitUntilUp() {
 
 export async function connectToSocket(
     initCallback: (data: InitializationData) => void,
-    onDataCallback: (data: SimulationData) => void,
+    onDataCallback: (data: SimulationData | VisualizationCommand) => void,
     onFinalizeCallback: () => void
 ) {
     let firstMessage = false;

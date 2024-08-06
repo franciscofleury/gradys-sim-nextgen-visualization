@@ -11,3 +11,27 @@ export interface SimulationData {
     real_time: number
     tracked_variables: Array<object>
 }
+
+export interface PaintNodeCommand {
+    command: "paint_node"
+    payload: {
+        node_id: number,
+        color: [number, number, number]
+    }
+}
+
+export interface PaintEnvironmentCommand {
+    command: "paint_environment"
+    payload: {
+        color: [number, number, number]
+    }
+}
+
+export interface ResizeNodesCommand {
+    command: "resize_nodes"
+    payload: {
+        size: number
+    }
+}
+
+export type VisualizationCommand = PaintNodeCommand | PaintEnvironmentCommand | ResizeNodesCommand;

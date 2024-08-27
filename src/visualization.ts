@@ -1,10 +1,15 @@
 import * as THREE from 'three'
 // @ts-ignore
 import { MapControls } from 'three/addons/controls/MapControls.js';
+//import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 import {InitializationData, SimulationData, VisualizationCommand} from "./data";
 
+interface Node {
+    mesh: THREE.Mesh;
+}
+
 let nodes: string[] = [];
-let vehicles: Record<string, THREE.Mesh> = {};
+let vehicles: Record<string, Node> = {};
 let scene: THREE.Scene = null;
 let renderer: THREE.Renderer = null;
 let camera: THREE.PerspectiveCamera = null;
@@ -26,7 +31,7 @@ colorForm.addEventListener("submit", (e) => {
     const nodes = formData.getAll("nodes").map(n => n as string)
 
     for (const node of nodes) {
-        vehicles[node].material = new THREE.MeshBasicMaterial({ color: color });
+        vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: color });
 
         localStorage.setItem(`${node}-color`, color)
     }
@@ -42,7 +47,7 @@ environmentForm.addEventListener("submit", (e) => {
     scene.background = new THREE.Color(bgColor)
     
     for (const vehicle of Object.values(vehicles)) {
-        vehicle.geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+        vehicle.mesh.geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
     }
 
     localStorage.setItem("environment-background-color", bgColor)
@@ -61,11 +66,11 @@ function loadStoredConfigs() {
     for(const node of nodes) {
         const color = localStorage.getItem(`${node}-color`)
         if (color != null) {
-            vehicles[node].material = new THREE.MeshBasicMaterial({ color: color });
+            vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: color });
 
         }
         if (nodeSize != null) {
-            vehicles[node].geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+            vehicles[node].mesh.geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
         }
     }
 }
@@ -122,12 +127,14 @@ export function initializeVisualization(data: InitializationData) {
     const vehicleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     for (const node of data.nodes) {
-        const vehicle = new THREE.Mesh(vehicleGeometry, vehicleMaterial);
-        vehicle.position.x = 0; // Random x position on the ground
-        vehicle.position.y = 0; // Height above the ground
-        vehicle.position.z = 0; // Random z position on the ground
-        scene.add(vehicle);
-        vehicles[node] = vehicle;
+        const vehicleMesh = new THREE.Mesh(vehicleGeometry, vehicleMaterial);
+        vehicleMesh.position.x = 0; // Random x position on the ground
+        vehicleMesh.position.y = 0; // Height above the ground
+        vehicleMesh.position.z = 0; // Random z position on the ground
+        scene.add(vehicleMesh);
+        vehicles[node] = {
+            mesh: vehicleMesh,
+        };
 
         const selectOption = document.createElement("option")
         selectOption.value = node
@@ -184,9 +191,9 @@ export function update(data: SimulationData) {
     // Update the vehicle positions
     nodes.forEach((node, i) => {
         const pos = data.positions[i];
-        vehicles[node].position.x = pos[0];
-        vehicles[node].position.y = pos[2];
-        vehicles[node].position.z = pos[1];
+        vehicles[node].mesh.position.x = pos[0];
+        vehicles[node].mesh.position.y = pos[2];
+        vehicles[node].mesh.position.z = pos[1];
     })
 
     let trackedVariableStrings = "------------------------\n"
@@ -211,14 +218,14 @@ export function executeCommand(command: VisualizationCommand) {
         const {node_id, color} = command.payload;
         const node = nodes[node_id];
         const rgbColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
-        vehicles[node].material = new THREE.MeshBasicMaterial({ color: rgbColor });
+        vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: rgbColor });
     } else if (command.command === "paint_environment") {
         const {color} = command.payload;
         scene.background = new THREE.Color(...color)
     } else if (command.command === "resize_nodes") {
         const {size} = command.payload;
         for (const vehicle of Object.values(vehicles)) {
-            vehicle.geometry = new THREE.SphereGeometry(size, 32, 32);
+            vehicle.mesh.geometry = new THREE.SphereGeometry(size, 32, 32);
         }
     }
 }

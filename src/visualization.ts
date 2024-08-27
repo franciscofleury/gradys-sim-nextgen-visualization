@@ -1,11 +1,13 @@
 import * as THREE from 'three'
 // @ts-ignore
 import { MapControls } from 'three/addons/controls/MapControls.js';
-//import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import {InitializationData, SimulationData, VisualizationCommand} from "./data";
 
 interface Node {
     mesh: THREE.Mesh;
+    text: TextGeometry;
 }
 
 let nodes: string[] = [];
@@ -13,6 +15,7 @@ let vehicles: Record<string, Node> = {};
 let scene: THREE.Scene = null;
 let renderer: THREE.Renderer = null;
 let camera: THREE.PerspectiveCamera = null;
+let font = null;
 
 let resizeEvent: () => void = null;
 
@@ -79,6 +82,11 @@ function loadStoredConfigs() {
 export function initializeVisualization(data: InitializationData) {
     nodes = data.nodes;
 
+    let loader = new FontLoader();
+    loader.load('node_modules/three/examples/fonts/helvetiker_regular.typeface.json', function (f) {
+        font = f;
+    })
+
     // Set up the scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color("#39d7ff")
@@ -134,6 +142,7 @@ export function initializeVisualization(data: InitializationData) {
         scene.add(vehicleMesh);
         vehicles[node] = {
             mesh: vehicleMesh,
+            text: null
         };
 
         const selectOption = document.createElement("option")
@@ -194,6 +203,13 @@ export function update(data: SimulationData) {
         vehicles[node].mesh.position.x = pos[0];
         vehicles[node].mesh.position.y = pos[2];
         vehicles[node].mesh.position.z = pos[1];
+
+        if (vehicles[node].text != null) {
+            vehicles[node].text.position.x = pos[0];
+            vehicles[node].text.position.y = pos[2] + 10;
+            vehicles[node].text.position.z = pos[1] + 5;
+            vehicles[node].text.lookAt( camera.position )
+        }
     })
 
     let trackedVariableStrings = "------------------------\n"
@@ -214,11 +230,24 @@ Real time: ${formatTime(data.real_time)}`
 }
 
 export function executeCommand(command: VisualizationCommand) {
+    console.log(command);
     if (command.command === "paint_node") {
-        const {node_id, color} = command.payload;
+        console.log(command.payload);
+        console.log("paint_node");
+        const {node_id, color, show_id} = command.payload;
         const node = nodes[node_id];
         const rgbColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
         vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: rgbColor });
+        if (vehicles[node].text != null) {
+            vehicles[node].text = show_id? vehicles[node].text : null;
+        } else if (show_id){
+            vehicles[node].text = new THREE.Mesh(
+                new TextGeometry(node, {font: font, size: 1, height:1, depth: 0.5}),
+                new THREE.MeshBasicMaterial({ color: 'rgb(0, 0, 0)'})
+            );
+            vehicles[node].text.lookAt( camera.position );
+            scene.add(vehicles[node].text);
+        }
     } else if (command.command === "paint_environment") {
         const {color} = command.payload;
         scene.background = new THREE.Color(...color)

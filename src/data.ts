@@ -16,7 +16,8 @@ export interface PaintNodeCommand {
     command: "paint_node"
     payload: {
         node_id: number,
-        color: [number, number, number]
+        color: [number, number, number],
+        show_id: boolean,
     }
 }
 

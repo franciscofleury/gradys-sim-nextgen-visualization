@@ -234,24 +234,20 @@ Real time: ${formatTime(data.real_time)}`
 }
 
 export function executeCommand(command: VisualizationCommand) {
-    console.log(command);
     if (command.command === "paint_node") {
-        console.log(command.payload);
-        console.log("paint_node");
-        const {node_id, color, show_id} = command.payload;
+        const {node_id, color} = command.payload;
         const node = nodes[node_id];
         const rgbColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
         vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: rgbColor });
-        if (vehicles[node].text != null) {
-            vehicles[node].text = show_id? vehicles[node].text : null;
-        } else if (show_id){
-            vehicles[node].text = new THREE.Mesh(
-                new TextGeometry(node, {font: font, size: nodeSize * 2, height:1, depth: 0.5}),
-                new THREE.MeshBasicMaterial({ color: 'rgb(0, 0, 0)'})
-            );
-            vehicles[node].text.lookAt( camera.position );
-            scene.add(vehicles[node].text);
-        }
+    } else if (command.command === "show_id") {
+        const {node_id, show} = command.payload;
+        const node = nodes[node_id];
+        vehicles[node].text = show? new THREE.Mesh(
+            new TextGeometry(node, {font: font, size: nodeSize * 2, height:1, depth: 0.5}),
+            new THREE.MeshBasicMaterial({ color: 'rgb(0, 0, 0)'})
+        ) : null;
+        vehicles[node].text.lookAt( camera.position );
+        scene.add(vehicles[node].text);
     } else if (command.command === "paint_environment") {
         const {color} = command.payload;
         scene.background = new THREE.Color(...color)

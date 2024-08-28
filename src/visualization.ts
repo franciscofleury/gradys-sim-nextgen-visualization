@@ -16,6 +16,7 @@ let scene: THREE.Scene = null;
 let renderer: THREE.Renderer = null;
 let camera: THREE.PerspectiveCamera = null;
 let font = null;
+let nodeSize = 0.1;
 
 let resizeEvent: () => void = null;
 
@@ -45,7 +46,7 @@ environmentForm.addEventListener("submit", (e) => {
 
     const formData = new FormData(environmentForm);
     const bgColor = formData.get("background-color") as string
-    const nodeSize = parseFloat(formData.get("node-size") as string)
+    nodeSize = parseFloat(formData.get("node-size") as string)
 
     scene.background = new THREE.Color(bgColor)
     
@@ -60,7 +61,7 @@ environmentForm.addEventListener("submit", (e) => {
 function loadStoredConfigs() {
     const bgColor = localStorage.getItem("environment-background-color")
     const nodeSizeStored = localStorage.getItem("environment-node-size")
-    const nodeSize = nodeSizeStored !== null ? parseFloat(nodeSizeStored) : null
+    nodeSize = nodeSizeStored !== null ? parseFloat(nodeSizeStored) : null
 
     if (bgColor !== null) {
         scene.background = new THREE.Color(bgColor)
@@ -205,10 +206,23 @@ export function update(data: SimulationData) {
         vehicles[node].mesh.position.z = pos[1];
 
         if (vehicles[node].text != null) {
-            vehicles[node].text.position.x = pos[0];
-            vehicles[node].text.position.y = pos[2] + 10;
-            vehicles[node].text.position.z = pos[1] + 5;
-            vehicles[node].text.lookAt( camera.position )
+            const obj = vehicles[node].text;
+            const height = pos[2] + (nodeSize *2);
+
+            obj.position.x = pos[0];
+            obj.position.y = height;
+            obj.position.z = pos[1];
+            
+            obj.lookAt(camera.position.x, height, camera.position.z);
+
+            const translation_vector_x = (camera.position.z - obj.position.z) * (-1);
+            const translation_vector_z = (camera.position.x - obj.position.x) * (+1);
+
+            const translation_vector = new THREE.Vector3(translation_vector_x, obj.position.y, translation_vector_z);
+            console.log(obj.position);
+            obj.translateOnAxis(translation_vector, +0.1);
+            console.log(obj.position);
+
         }
     })
 

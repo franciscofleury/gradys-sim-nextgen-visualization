@@ -16,7 +16,7 @@ let scene: THREE.Scene = null;
 let renderer: THREE.Renderer = null;
 let camera: THREE.PerspectiveCamera = null;
 let font = null;
-
+let nodeSize = 0.1;
 let resizeEvent: () => void = null;
 
 const statusElement = document.getElementById("status") as HTMLPreElement;
@@ -45,7 +45,7 @@ environmentForm.addEventListener("submit", (e) => {
 
     const formData = new FormData(environmentForm);
     const bgColor = formData.get("background-color") as string
-    const nodeSize = parseFloat(formData.get("node-size") as string)
+    nodeSize = parseFloat(formData.get("node-size") as string)
 
     scene.background = new THREE.Color(bgColor)
     
@@ -60,7 +60,7 @@ environmentForm.addEventListener("submit", (e) => {
 function loadStoredConfigs() {
     const bgColor = localStorage.getItem("environment-background-color")
     const nodeSizeStored = localStorage.getItem("environment-node-size")
-    const nodeSize = nodeSizeStored !== null ? parseFloat(nodeSizeStored) : null
+    nodeSize = nodeSizeStored !== null ? parseFloat(nodeSizeStored) : null
 
     if (bgColor !== null) {
         scene.background = new THREE.Color(bgColor)
@@ -206,7 +206,7 @@ export function update(data: SimulationData) {
 
         if (vehicles[node].text != null) {
             vehicles[node].text.position.x = pos[0];
-            vehicles[node].text.position.y = pos[2] + 10;
+            vehicles[node].text.position.y = pos[2] + (nodeSize * 3);
             vehicles[node].text.position.z = pos[1] + 5;
             vehicles[node].text.lookAt( camera.position )
         }
@@ -242,7 +242,7 @@ export function executeCommand(command: VisualizationCommand) {
             vehicles[node].text = show_id? vehicles[node].text : null;
         } else if (show_id){
             vehicles[node].text = new THREE.Mesh(
-                new TextGeometry(node, {font: font, size: 1, height:1, depth: 0.5}),
+                new TextGeometry(node, {font: font, size: nodeSize * 2, height:1, depth: 0.5}),
                 new THREE.MeshBasicMaterial({ color: 'rgb(0, 0, 0)'})
             );
             vehicles[node].text.lookAt( camera.position );

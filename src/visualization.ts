@@ -49,8 +49,12 @@ environmentForm.addEventListener("submit", (e) => {
 
     scene.background = new THREE.Color(bgColor)
     
-    for (const vehicle of Object.values(vehicles)) {
+    for (const node of Object.keys(vehicles)) {
+        const vehicle = vehicles[node];
         vehicle.mesh.geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+        if (vehicle.text != null) {
+            vehicle.text.geometry = new TextGeometry(node, {font: font, size: nodeSize * 2, height:1, depth: 0.5});
+        }
     }
 
     localStorage.setItem("environment-background-color", bgColor)

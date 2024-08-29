@@ -24,6 +24,8 @@ const trackedElement = document.getElementById("tracked") as HTMLPreElement;
 const colorForm = document.getElementById("color-form") as HTMLFormElement;
 const environmentForm = document.getElementById("environment-form") as HTMLFormElement;
 const nodeSelectElement= document.getElementById("nodes") as HTMLSelectElement;
+const showIdForm = document.getElementById("showId") as HTMLFormElement;
+const nodeCheckboxTableElement = document.getElementById("nodes-checkbox") as HTMLTableElement
 
 
 colorForm.addEventListener("submit", (e) => {
@@ -61,6 +63,26 @@ environmentForm.addEventListener("submit", (e) => {
     localStorage.setItem("environment-node-size", nodeSize.toString())
 })
 
+showIdForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+
+    const formData = new FormData(showIdForm)
+    const checkedNodes = formData.getAll("nodes-checkbox").map(n => n as string);
+
+    nodes.forEach(node => {
+        if (vehicles[node].text != null) {
+            scene.remove(vehicles[node].text);
+        } 
+        vehicles[node].text = null;
+    });
+
+    checkedNodes.forEach(node => {
+        vehicles[node].text = getTextObject(node);
+        scene.add(vehicles[node].text);
+    });
+
+})
+
 function loadStoredConfigs() {
     const bgColor = localStorage.getItem("environment-background-color")
     const nodeSizeStored = localStorage.getItem("environment-node-size")
@@ -82,6 +104,32 @@ function loadStoredConfigs() {
     }
 }
 
+function getTableRowElement(node: string) {
+    const tr = document.createElement('tr');
+    const name_th = document.createElement('td');
+    const check_th = document.createElement('td');
+    const check = document.createElement('input');
+    
+    tr.id = node;
+    name_th.textContent = node;
+    check.checked = false;
+    check.value = node;
+    check.type = 'checkbox';
+    check.name = 'nodes-checkbox';
+    check_th.id = "check";
+    check_th.appendChild(check);
+    tr.appendChild(name_th);
+    tr.appendChild(check_th);
+
+    return tr;
+}
+
+function getTextObject(node: string) {
+    return new THREE.Mesh(
+        new TextGeometry(node, {font: font, size: nodeSize * 2, height:1, depth: 0.5}),
+        new THREE.MeshBasicMaterial({ color: 'rgb(0, 0, 0)'})
+    );
+}
 
 export function initializeVisualization(data: InitializationData) {
     nodes = data.nodes;
@@ -153,6 +201,7 @@ export function initializeVisualization(data: InitializationData) {
         selectOption.value = node
         selectOption.innerText = node
         nodeSelectElement.appendChild(selectOption)
+        nodeCheckboxTableElement.appendChild(getTableRowElement(node));
     }
 
     loadStoredConfigs()
@@ -194,7 +243,6 @@ function formatTime(time: number) {
     const formattedSeconds = seconds.toLocaleString(undefined, {minimumIntegerDigits: 2})
     return `${formattedMinutes}:${formattedSeconds}:${milliseconds}`
 }
-
 
 export function update(data: SimulationData) {
     if (scene == null) {
@@ -240,12 +288,10 @@ export function executeCommand(command: VisualizationCommand) {
         const rgbColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
         vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: rgbColor });
     } else if (command.command === "show_id") {
+        console.log(command);
         const {node_id, show} = command.payload;
         const node = nodes[node_id];
-        vehicles[node].text = show? new THREE.Mesh(
-            new TextGeometry(node, {font: font, size: nodeSize * 2, height:1, depth: 0.5}),
-            new THREE.MeshBasicMaterial({ color: 'rgb(0, 0, 0)'})
-        ) : null;
+        vehicles[node].text = show? getTextObject(node) : null;
         vehicles[node].text.lookAt( camera.position );
         scene.add(vehicles[node].text);
     } else if (command.command === "paint_environment") {

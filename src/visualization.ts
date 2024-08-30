@@ -257,8 +257,8 @@ export function update(data: SimulationData) {
         vehicles[node].mesh.position.z = pos[1];
 
         if (vehicles[node].text != null) {
-            vehicles[node].text.position.x = pos[0];
-            vehicles[node].text.position.y = pos[2] + (nodeSize * 3);
+            vehicles[node].text.position.x = pos[0] - 5;
+            vehicles[node].text.position.y = pos[2] + (nodeSize * 5);
             vehicles[node].text.position.z = pos[1] + 5;
             vehicles[node].text.lookAt( camera.position )
         }
@@ -287,7 +287,7 @@ export function executeCommand(command: VisualizationCommand) {
         const node = nodes[node_id];
         const rgbColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
         vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: rgbColor });
-    } else if (command.command === "show_id") {
+    } else if (command.command === "show_node_id") {
         console.log(command);
         const {node_id, show} = command.payload;
         const node = nodes[node_id];

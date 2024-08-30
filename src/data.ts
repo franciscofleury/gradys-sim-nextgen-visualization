@@ -20,8 +20,8 @@ export interface PaintNodeCommand {
     }
 }
 
-export interface ShowIdCommand {
-    command: "show_id"
+export interface ShowNodeIdCommand {
+    command: "show_node_id"
     payload: {
         node_id: number,
         show: boolean
@@ -42,4 +42,4 @@ export interface ResizeNodesCommand {
     }
 }
 
-export type VisualizationCommand = PaintNodeCommand | ShowIdCommand | PaintEnvironmentCommand | ResizeNodesCommand;
+export type VisualizationCommand = PaintNodeCommand | ShowNodeIdCommand | PaintEnvironmentCommand | ResizeNodesCommand;

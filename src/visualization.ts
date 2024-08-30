@@ -288,7 +288,6 @@ export function executeCommand(command: VisualizationCommand) {
         const rgbColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
         vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: rgbColor });
     } else if (command.command === "show_node_id") {
-        console.log(command);
         const {node_id, show} = command.payload;
         const node = nodes[node_id];
         vehicles[node].text = show? getTextObject(node) : null;

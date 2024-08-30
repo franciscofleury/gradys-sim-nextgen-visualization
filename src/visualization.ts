@@ -81,12 +81,23 @@ showIdForm.addEventListener("submit", (e) => {
         scene.add(vehicles[node].text);
     });
 
+    const checkedStr = checkedNodes.join(" ");
+    localStorage.setItem("show-id", checkedStr);
 })
+
+function setCheckBox(checked_nodes: string[]) {
+    
+}
 
 function loadStoredConfigs() {
     const bgColor = localStorage.getItem("environment-background-color")
     const nodeSizeStored = localStorage.getItem("environment-node-size")
+    const checkedNodes = localStorage.getItem("show-id")
     nodeSize = nodeSizeStored !== null ? parseFloat(nodeSizeStored) : null
+
+    if (checkedNodes !== null) {
+        const checkboxElements = document.querySelectorAll("input#show-id")
+    }
 
     if (bgColor !== null) {
         scene.background = new THREE.Color(bgColor)
@@ -116,6 +127,7 @@ function getTableRowElement(node: string) {
     check.value = node;
     check.type = 'checkbox';
     check.name = 'nodes-checkbox';
+    check.id = 'show-check'
     check_th.id = "check";
     check_th.appendChild(check);
     tr.appendChild(name_th);

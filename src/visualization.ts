@@ -4,6 +4,7 @@ import { MapControls } from 'three/addons/controls/MapControls.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import {InitializationData, SimulationData, VisualizationCommand} from "./data";
+import { initializeInteraction } from './interaction';
 
 interface Node {
     mesh: THREE.Mesh;
@@ -70,34 +71,22 @@ showIdForm.addEventListener("submit", (e) => {
     const checkedNodes = formData.getAll("nodes-checkbox").map(n => n as string);
 
     nodes.forEach(node => {
-        if (vehicles[node].text != null) {
-            scene.remove(vehicles[node].text);
-        } 
-        vehicles[node].text = null;
-    });
+        scene.remove(vehicles[node].text)
+        vehicles[node].text = null
+        localStorage.setItem(`${node}-show`, 'false')
+    })
 
     checkedNodes.forEach(node => {
-        vehicles[node].text = getTextObject(node);
-        scene.add(vehicles[node].text);
-    });
-
-    const checkedStr = checkedNodes.join(" ");
-    localStorage.setItem("show-id", checkedStr);
+        vehicles[node].text = getTextObject(node)
+        scene.add(vehicles[node].text)
+        localStorage.setItem(`${node}-show`, 'true')
+    })
 })
-
-function setCheckBox(checked_nodes: string[]) {
-    
-}
 
 function loadStoredConfigs() {
     const bgColor = localStorage.getItem("environment-background-color")
     const nodeSizeStored = localStorage.getItem("environment-node-size")
-    const checkedNodes = localStorage.getItem("show-id")
     nodeSize = nodeSizeStored !== null ? parseFloat(nodeSizeStored) : null
-
-    if (checkedNodes !== null) {
-        const checkboxElements = document.querySelectorAll("input#show-id")
-    }
 
     if (bgColor !== null) {
         scene.background = new THREE.Color(bgColor)
@@ -105,12 +94,17 @@ function loadStoredConfigs() {
 
     for(const node of nodes) {
         const color = localStorage.getItem(`${node}-color`)
+        const show = localStorage.getItem(`${node}-show`)
         if (color != null) {
             vehicles[node].mesh.material = new THREE.MeshBasicMaterial({ color: color });
 
         }
         if (nodeSize != null) {
             vehicles[node].mesh.geometry = new THREE.SphereGeometry(nodeSize, 32, 32);
+        }
+        if (show != null && show == 'true') {
+                vehicles[node].text = getTextObject(node)
+                scene.add(vehicles[node].text)
         }
     }
 }
@@ -137,19 +131,18 @@ function getTableRowElement(node: string) {
 }
 
 function getTextObject(node: string) {
+    if (vehicles[node].text) {
+        scene.remove(vehicles[node].text)
+        vehicles[node].text = null;
+    }
     return new THREE.Mesh(
         new TextGeometry(node, {font: font, size: nodeSize * 2, height:1, depth: 0.5}),
         new THREE.MeshBasicMaterial({ color: 'rgb(0, 0, 0)'})
     );
 }
 
-export function initializeVisualization(data: InitializationData) {
+function initializeVisualization(data: InitializationData) {
     nodes = data.nodes;
-
-    let loader = new FontLoader();
-    loader.load('node_modules/three/examples/fonts/helvetiker_regular.typeface.json', function (f) {
-        font = f;
-    })
 
     // Set up the scene
     scene = new THREE.Scene();
@@ -197,7 +190,7 @@ export function initializeVisualization(data: InitializationData) {
     // Create vehicles on the ground
     const vehicleGeometry = new THREE.SphereGeometry(0.1, 32, 32);
     const vehicleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
+    console.log(`Iterating through node-list`)
     for (const node of data.nodes) {
         const vehicleMesh = new THREE.Mesh(vehicleGeometry, vehicleMaterial);
         vehicleMesh.position.x = 0; // Random x position on the ground
@@ -213,6 +206,7 @@ export function initializeVisualization(data: InitializationData) {
         selectOption.value = node
         selectOption.innerText = node
         nodeSelectElement.appendChild(selectOption)
+        console.log(`Adding to table: ${node}`)
         nodeCheckboxTableElement.appendChild(getTableRowElement(node));
     }
 
@@ -335,12 +329,27 @@ export function finalizeVisualization() {
     }
 
     nodeSelectElement.innerHTML = ""
+    nodeCheckboxTableElement.innerHTML = "<tr><th>NodeID</th><th>Show</th></tr>"
 
     nodes = [];
 
     renderer = null
     camera = null
     scene = null
+}
+
+// This function is responsible for loading resources before the visualization start. This is the entry-point for the simulation.
+export function initializeThree(data: InitializationData) {
+    const manager = new THREE.LoadingManager();
+    manager.onLoad = () => {
+        initializeVisualization(data)
+        initializeInteraction()
+    }
+
+    const loader = new FontLoader(manager)
+    loader.load('node_modules/three/examples/fonts/helvetiker_regular.typeface.json', function (f) {
+        font = f;
+    });
 }
 
 export function configureInteractions() {
